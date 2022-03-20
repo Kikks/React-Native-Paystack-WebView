@@ -1,4 +1,4 @@
-import * as React from 'react'
+import * as React from 'react';
 import { useState, useEffect, forwardRef, useRef, useImperativeHandle } from 'react';
 import { Modal, View, ActivityIndicator, SafeAreaView } from 'react-native';
 import { WebView, WebViewNavigation } from 'react-native-webview';
@@ -56,17 +56,54 @@ const Paystack: React.ForwardRefRenderFunction<React.ReactNode, PayStackProps> =
       <!DOCTYPE html>
       <html lang="en">
         <head>
-          <meta charset="UTF-8">
-          <meta http-equiv="X-UA-Compatible" content="ie=edge">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <meta charset="UTF-8" />
+          <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+          <style>
+            * {
+              margin: 0;
+              padding: 0;
+              box-sizing: border-box;
+            }
+
+            body {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              padding: 2rem;
+              font-family: sans-serif;
+            }
+
+            .container {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              text-align: center;
+            }
+
+            .title {
+              font-size: 1rem;
+              margin-bottom: 1rem;
+            }
+
+            .button {
+              font-family: sans-serif;
+              font-size: 0.8rem;
+              outline: none;
+              border: none;
+              border-radius: 0.4rem;
+              background: linear-gradient(180deg, #44b669 0, #40ad57);
+              padding: 0.7rem 1.5rem;
+              color: #fff;
+            }
+          </style>
           <title>Paystack</title>
         </head>
-          <body  onload="payWithPaystack()" style="background-color:#fff;height:100vh">
-            <script src="https://js.paystack.co/v1/inline.js"></script>
-            <script type="text/javascript">
-              window.onload = payWithPaystack;
-              function payWithPaystack(){
-              var handler = PaystackPop.setup({ 
+        <body style="background-color: #fff; height: 100vh">
+          <script type="text/javascript">
+            function payWithPaystack() {
+              var handler = PaystackPop.setup({
                 key: '${paystackKey}',
                 email: '${billingEmail}',
                 firstname: '${firstName}',
@@ -92,12 +129,27 @@ const Paystack: React.ForwardRefRenderFunction<React.ReactNode, PayStackProps> =
                     var resp = {event:'cancelled'};
                     window.ReactNativeWebView.postMessage(JSON.stringify(resp))
                 }
-                });
-                handler.openIframe();
-                }
-            </script> 
-          </body>
-      </html> 
+              });
+              handler.openIframe();
+            }
+
+            function handleError() {
+              var body = document.querySelector("body");
+              body.innerHTML = ${`
+                  <div class="container">
+                    <span class="title">Something went wrong, please refresh.</span>
+                    <button class="button" onclick="location.reload()">Refresh</button>
+                  </div>
+                `}
+            }
+          </script>
+          <script
+            src="https://js.paystack.co/v1/inline.js"
+            onload="payWithPaystack()"
+            onerror="handleError()"
+          ></script>
+        </body>
+      </html>
       `;
 
   const messageReceived = (data: string) => {
@@ -167,7 +219,3 @@ const Paystack: React.ForwardRefRenderFunction<React.ReactNode, PayStackProps> =
 };
 
 export default forwardRef(Paystack);
-
-
-
-
