@@ -1,29 +1,27 @@
 # React-Native-Paystack-WebView
 
-```V5 is coming 🎉```
+`V5 is coming 🎉`
 
 `As we celebrate this package being backed by `[Paystack](https://paystack.com)`, we have been hard at work re-vamping the package and making our api's very closely related to the paystack inline web payment, all to enable you accept payment seemlessly in your React Native Applications 😊.`
 
- 
-[![All Contributors](https://img.shields.io/badge/all_contributors-9-orange.svg?style=flat-square)](#contributors-) 
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://reactjs.org/docs/how-to-contribute.html#your-first-pull-request) 
- 
+[![All Contributors](https://img.shields.io/badge/all_contributors-9-orange.svg?style=flat-square)](#contributors-)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://reactjs.org/docs/how-to-contribute.html#your-first-pull-request)
 
-The package allows you accept payment using paystack, install, add keys and use. No stress :) 
+The package allows you accept payment using paystack, install, add keys and use. No stress :)
 
 ### [](https://github.com/just1and0/React-Native-Paystack-WebView#installation)Installation
 
 Add React-Native-Paystack-WebView to your project by running;
 
-`npm install react-native-paystack-webview`
+`npm install react-native-paystack-webview-rd`
 
 or
 
-`yarn add react-native-paystack-webview`
+`yarn add react-native-paystack-webview-rd`
 
 ### **One more thing**
 
-To frontload the installation work, let's also install and configure dependencies used by this project, being **react-native-webview** 
+To frontload the installation work, let's also install and configure dependencies used by this project, being **react-native-webview**
 
 run
 
@@ -43,13 +41,13 @@ and that's it, you're all good to go!
 
 ```javascript
 import React from 'react';
-import  { Paystack }  from 'react-native-paystack-webview';
+import { Paystack } from 'react-native-paystack-webview-rd';
 import { View } from 'react-native';
 
 function Pay() {
   return (
     <View style={{ flex: 1 }}>
-      <Paystack  
+      <Paystack
         paystackKey="your-public-key-here"
         amount={'25000.00'}
         billingEmail="paystackwebview@something.com"
@@ -73,11 +71,11 @@ Make use of a `ref` to start transaction. See example below;
 
 ```javascript
 import React, { useRef } from 'react';
-import  { Paystack , paystackProps}  from 'react-native-paystack-webview';
+import  { Paystack , paystackProps}  from 'react-native-paystack-webview-rd';
 import { View, TouchableOpacity,Text } from 'react-native';
 
 function Pay(){
-  const paystackWebViewRef = useRef<paystackProps.PayStackRef>(); 
+  const paystackWebViewRef = useRef<paystackProps.PayStackRef>();
 
   return (
     <View style={{flex: 1}}>
@@ -121,12 +119,11 @@ function Pay(){
 | `refNumber`                          |                                                                         Reference number, if you have already generated one                                                                         | default: `''+Math.floor((Math.random() * 1000000000) + 1)` |
 | `handleWebViewMessage`               |                                                                          Will be called when a WebView receives a message                                                                           |                                            default: `true` |
 
-
 ## [](https://github.com/just1and0/object-to-array-convert#contributions)Contributions
 
-Want to help make this package even more awesome? [Read how to contribute](https://github.com/just1and0/React-Native-Paystack-WebView/blob/master/CONTRIBUTING.md) and feel free to send in your PR!
+Want to help make this package even more awesome? [Read how to contribute](https://github.com/Kikks/React-Native-Paystack-WebView/blob/master/CONTRIBUTING.md) and feel free to send in your PR!
 
-## [](https://github.com/just1and0/React-Native-Paystack-WebView#licensing)Licensing
+## [](https://github.com/Kikks/React-Native-Paystack-WebView#licensing)Licensing
 
 This project is licensed under MIT license.
 
@@ -179,9 +176,10 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
 
-
 # Roadmap
+
 we have a lot to get done before we hit stable, here's a list;
+
 - Make the reference usage more user friendly
 - Since you want it to conform to InlineJS, let the variable names also match
 - Let the parameter types also conform to InlineJS parameter types
