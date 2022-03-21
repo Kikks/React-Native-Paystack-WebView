@@ -4,7 +4,7 @@ import { Modal, View, ActivityIndicator, SafeAreaView } from 'react-native';
 import { WebView, WebViewNavigation } from 'react-native-webview';
 import { getAmountValueInKobo, getChannels } from './helper';
 import { PayStackProps, PayStackRef } from './types';
-import Handlebars from 'handlebars';
+const Handlebars = require('react-native-handlebars');
 
 const CLOSE_URL = 'https://standard.paystack.co/close';
 
@@ -109,20 +109,20 @@ const Paystack: React.ForwardRefRenderFunction<React.ReactNode, PayStackProps> =
             src="https://js.paystack.co/v1/inline.js"
             onload='(function() {
               var handler = PaystackPop.setup({
-                key: {{paystackKey}},
-                email: {{billingEmail}},
-                firstname: {{firstName}},
-                lastname: {{lastName}},
-                phone: {{phone}},
+                key: "{{paystackKey}}",
+                email: "{{billingEmail}}",
+                firstname: "{{firstName}}",
+                lastname: "{{lastName}}",
+                phone: "{{phone}}",
                 amount: {{calculatedAmount}}, 
-                currency: {{currency}},
+                currency: "{{currency}}",
                 channels: {{stringifiedChannels}},
-                {{refNumberString}},
+                {{refNumberString}}
                 metadata: {
                 custom_fields: [
                         {
-                        display_name:  {{fullName}},
-                        variable_name:  {{billingName}},
+                        display_name:  "{{fullName}}",
+                        variable_name:  "{{billingName}}",
                         value:""
                         }
                 ]},
@@ -139,9 +139,10 @@ const Paystack: React.ForwardRefRenderFunction<React.ReactNode, PayStackProps> =
             })()'
             onerror='(function() {
               var body = document.querySelector("body");
-              body.innerHTML = "<div><span>Something went wrong, please refresh.</span><button>Refresh</button></div>"
+              body.innerHTML = "<div><span>Something went wrong and you cannot proceed with payment. Please close the window and try again later.</span><button>Close</button></div>"
 							document.querySelector("button").addEventListener("click", function() {
-								location.reload()
+								var resp = {event:"cancelled"};
+                window.ReactNativeWebView.postMessage(JSON.stringify(resp))
 							})
             })()'
           ></script>
