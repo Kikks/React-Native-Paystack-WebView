@@ -4,6 +4,7 @@ import { Modal, View, ActivityIndicator, SafeAreaView } from 'react-native';
 import { WebView, WebViewNavigation } from 'react-native-webview';
 import { getAmountValueInKobo, getChannels } from './helper';
 import { PayStackProps, PayStackRef } from './types';
+import Handlebars from 'handlebars';
 
 const CLOSE_URL = 'https://standard.paystack.co/close';
 
@@ -51,8 +52,11 @@ const Paystack: React.ForwardRefRenderFunction<React.ReactNode, PayStackProps> =
   };
 
   const refNumberString = refNumber ? `ref: '${refNumber}',` : ''; // should only send ref number if present, else if blank, paystack will auto-generate one
+  const calculatedAmount = getAmountValueInKobo(amount);
+  const stringifiedChannels = JSON.stringify(channels);
+  const fullName = firstName + '' + lastName;
 
-  const Paystackcontent = `   
+  const template = `   
       <!DOCTYPE html>
       <html lang="en">
         <head>
@@ -74,7 +78,7 @@ const Paystack: React.ForwardRefRenderFunction<React.ReactNode, PayStackProps> =
               font-family: sans-serif;
             }
 
-            .container {
+            div {
               display: flex;
               flex-direction: column;
               align-items: center;
@@ -82,12 +86,12 @@ const Paystack: React.ForwardRefRenderFunction<React.ReactNode, PayStackProps> =
               text-align: center;
             }
 
-            .title {
+            span {
               font-size: 1rem;
               margin-bottom: 1rem;
             }
 
-            .button {
+            button {
               font-family: sans-serif;
               font-size: 0.8rem;
               outline: none;
@@ -102,37 +106,6 @@ const Paystack: React.ForwardRefRenderFunction<React.ReactNode, PayStackProps> =
         </head>
         <body style="background-color: #fff; height: 100vh">
           <script type="text/javascript">
-            function payWithPaystack() {
-              var handler = PaystackPop.setup({
-                key: '${paystackKey}',
-                email: '${billingEmail}',
-                firstname: '${firstName}',
-                lastname: '${lastName}',
-                phone: '${phone}',
-                amount: ${getAmountValueInKobo(amount)}, 
-                currency: '${currency}',
-                ${getChannels(channels)}
-                ${refNumberString}
-                metadata: {
-                custom_fields: [
-                        {
-                        display_name:  '${firstName + ' ' + lastName}',
-                        variable_name:  '${billingName}',
-                        value:''
-                        }
-                ]},
-                callback: function(response){
-                      var resp = {event:'successful', transactionRef:response};
-                        window.ReactNativeWebView.postMessage(JSON.stringify(resp))
-                },
-                onClose: function(){
-                    var resp = {event:'cancelled'};
-                    window.ReactNativeWebView.postMessage(JSON.stringify(resp))
-                }
-              });
-              handler.openIframe();
-            }
-
             function handleError() {
               var body = document.querySelector("body");
               body.innerHTML = ${`
@@ -145,12 +118,51 @@ const Paystack: React.ForwardRefRenderFunction<React.ReactNode, PayStackProps> =
           </script>
           <script
             src="https://js.paystack.co/v1/inline.js"
-            onload="payWithPaystack()"
-            onerror="handleError()"
+            onload='(function() {
+              var handler = PaystackPop.setup({
+                key: {{paystackKey}},
+                email: {{billingEmail}},
+                firstname: {{firstName}},
+                lastname: {{lastName}},
+                phone: {{phone}},
+                amount: {{calculatedAmount}}, 
+                currency: {{currency}},
+                channels: {{stringifiedChannels}},
+                {{refNumberString}},
+                metadata: {
+                custom_fields: [
+                        {
+                        display_name:  {{fullName}},
+                        variable_name:  {{billingName}},
+                        value:""
+                        }
+                ]},
+                callback: function(response){
+                      var resp = {event:"successful", transactionRef:response};
+                        window.ReactNativeWebView.postMessage(JSON.stringify(resp))
+                },
+                onClose: function(){
+                    var resp = {event:"cancelled"};
+                    window.ReactNativeWebView.postMessage(JSON.stringify(resp))
+                }
+              });
+              handler.openIframe();
+            })()'
+            onerror='(function() {
+              var body = document.querySelector("body");
+              body.innerHTML = "<div><span>Something went wrong, please refresh.</span><button>Refresh</button></div>"
+							document.querySelector("button").addEventListener("click", function() {
+								location.reload()
+							})
+            })()'
           ></script>
         </body>
       </html>
       `;
+
+  const Paystackcontent = Handlebars.compile(template, {
+    noEscape: true,
+  });
 
   const messageReceived = (data: string) => {
     const webResponse = JSON.parse(data);
@@ -196,7 +208,21 @@ const Paystack: React.ForwardRefRenderFunction<React.ReactNode, PayStackProps> =
       <SafeAreaView style={{ flex: 1 }}>
         <WebView
           style={[{ flex: 1 }]}
-          source={{ html: Paystackcontent }}
+          source={{
+            html: Paystackcontent({
+              paystackKey,
+              billingEmail,
+              billingName,
+              firstName,
+              lastName,
+              fullName,
+              refNumberString,
+              calculatedAmount,
+              stringifiedChannels,
+              phone,
+              currency,
+            }),
+          }}
           onMessage={(e) => {
             messageReceived(e.nativeEvent?.data);
           }}
