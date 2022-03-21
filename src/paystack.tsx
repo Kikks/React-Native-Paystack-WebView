@@ -105,17 +105,6 @@ const Paystack: React.ForwardRefRenderFunction<React.ReactNode, PayStackProps> =
           <title>Paystack</title>
         </head>
         <body style="background-color: #fff; height: 100vh">
-          <script type="text/javascript">
-            function handleError() {
-              var body = document.querySelector("body");
-              body.innerHTML = ${`
-                  <div class="container">
-                    <span class="title">Something went wrong, please refresh.</span>
-                    <button class="button" onclick="location.reload()">Refresh</button>
-                  </div>
-                `}
-            }
-          </script>
           <script
             src="https://js.paystack.co/v1/inline.js"
             onload='(function() {
